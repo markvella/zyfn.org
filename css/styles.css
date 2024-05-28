@@ -1,0 +1,26 @@
+.center{
+    text-align: center;
+    width:50%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.logo{
+    clear: both;
+    margin-left: auto;
+    margin-right: auto;
+}
+.coming-soon{
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    font-family: "Montserrat", sans-serif;
+    font-size: 48px;
+}
+
+.mission{    
+    font-family: "Montserrat", sans-serif;
+  font-size: 22px;
+  text-align: justify;
+}
