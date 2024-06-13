@@ -5,6 +5,15 @@
             function handleCredentialResponse(e){
                 console.log(e);
             }
+
+            async function load(){
+                var id = 1;
+                var response = await gapi.client.sheets.spreadsheets.values.get({
+                    spreadsheetId: '1RE09-H7LdxGulyVAWGDuIMsSrhdAoShkv45Bm7oZsOE',
+                    range: 'Food!A:H',
+                });
+                console.log(response);
+            }
         </script>
         <div id="g_id_onload"
         data-client_id="1068720503351-jlnlmdnejn3hpv3eb8it78evk8ecb5i9"
