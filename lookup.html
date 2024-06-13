@@ -84,6 +84,8 @@
                 // Skip display of account chooser and consent dialog for an existing session.
                     tokenClient.requestAccessToken({prompt: ''});
                 }
+        console.log(gapi.client.getToken());
+        listMajors();
         }
       }
 
@@ -107,8 +109,6 @@
           // Skip display of account chooser and consent dialog for an existing session.
           tokenClient.requestAccessToken({prompt: ''});
         }
-        console.log(gapi.client.getToken());
-        listMajors();
       }
 
       /**
