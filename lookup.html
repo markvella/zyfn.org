@@ -1,7 +1,11 @@
 <html>
     <body>
+        <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
         <script src="https://accounts.google.com/gsi/client" async defer></script>
         <script>
+            function gapLoaded(){
+                console.log("loaded");
+            }
             async function handleCredentialResponse(e){
                 console.log(e);
                 await load();
