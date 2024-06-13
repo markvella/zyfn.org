@@ -3,14 +3,24 @@
         <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
         <script src="https://accounts.google.com/gsi/client" async defer></script>
         <script>
-            function gapLoaded(){
-                console.log("loaded");
+            
+      const DISCOVERY_DOC = 'https://sheets.googleapis.com/$discovery/rest?version=v4';
+      const API_KEY = "AIzaSyCcEeISAYg721hRbRDxDRcvW2ubpXlkKL0"
+            function gapiLoaded() {
+                gapi.load('client', initializeGapiClient);
             }
             async function handleCredentialResponse(e){
                 console.log(e);
-                await load();
             }
 
+            async function initializeGapiClient() {
+                await gapi.client.init({
+                apiKey: API_KEY,
+                discoveryDocs: [DISCOVERY_DOC],
+                });
+                gapiInited = true;
+                await load();
+            }
             async function load(){
                 var id = 1;
                 var response = await gapi.client.sheets.spreadsheets.values.get({
