@@ -24,13 +24,10 @@
             }
 
             async function initializeGapiClient() {
-                await gapi.client.init({
-                discoveryDocs: [DISCOVERY_DOC],
-                scope: '/auth/spreadsheets'
+                await gapi.client.init({}).then(()=>{                
+                    load();
                 });
                 gapiInited = true;
-                
-                await load();
             }
             async function load(){
                 var id = 1;
