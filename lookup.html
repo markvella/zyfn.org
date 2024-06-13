@@ -1,15 +1,25 @@
 <html>
     <body>
         <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
-        <script src="https://accounts.google.com/gsi/client" async defer></script>
+        <script src="https://accounts.google.com/gsi/client" async defer  onload="gisLoaded()"></script>
         <script>
             
       const DISCOVERY_DOC = 'https://sheets.googleapis.com/$discovery/rest?version=v4';
       const API_KEY = "AIzaSyCcEeISAYg721hRbRDxDRcvW2ubpXlkKL0"
+
+      function gisLoaded() {
+        tokenClient = google.accounts.oauth2.initTokenClient({
+          client_id: '1068720503351-jlnlmdnejn3hpv3eb8it78evk8ecb5i9',
+          scope: '/auth/spreadsheets',
+          callback: '', // defined later
+        });
+        console.log(tokenClient);
+      }
             function gapiLoaded() {
             }
             async function handleCredentialResponse(e){
                 console.log(e);
+                credential = e.credential;
                 gapi.load('client', initializeGapiClient);
             }
 
