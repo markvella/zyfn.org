@@ -2,8 +2,9 @@
     <body>
         <script src="https://accounts.google.com/gsi/client" async defer></script>
         <script>
-            function handleCredentialResponse(e){
+            async function handleCredentialResponse(e){
                 console.log(e);
+                await load();
             }
 
             async function load(){
