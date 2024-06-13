@@ -11,6 +11,7 @@
             }
             async function handleCredentialResponse(e){
                 console.log(e);
+                await load();
             }
 
             async function initializeGapiClient() {
@@ -19,7 +20,6 @@
                 discoveryDocs: [DISCOVERY_DOC],
                 });
                 gapiInited = true;
-                await load();
             }
             async function load(){
                 var id = 1;
