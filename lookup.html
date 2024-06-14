@@ -76,6 +76,11 @@
       async function maybeEnableButtons() {
         if (gapiInited && gisInited) {            
           document.getElementById('authorize_button').style.visibility = 'visible';
+          
+          gapi.client.setToken(localStorage.getItem('gapiToken'));
+          if (gapi.client.getToken() !== null) {
+            tokenClient.requestAccessToken({prompt: ''});
+          }
         }
       }
 
