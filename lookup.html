@@ -31,10 +31,11 @@
       /* verbose= */ false);
     html5QrcodeScanner.render(onScanSuccess, onScanFailure);
 
-    function onScanSuccess(decodedText, decodedResult) {
+    async function onScanSuccess(decodedText, decodedResult) {
   // handle the scanned code as you like, for example:
-  alert(decodedText);
-}
+      ticketId = decodedText;
+      await listMajors();
+    }
 
 function onScanFailure(error) {
   // handle scan failure, usually better to ignore and keep scanning.
