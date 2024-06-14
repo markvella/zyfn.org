@@ -76,8 +76,10 @@
       async function maybeEnableButtons() {
         if (gapiInited && gisInited) {            
           document.getElementById('authorize_button').style.visibility = 'visible';
-          
-          gapi.client.setToken(localStorage.getItem('gapiToken'));
+          var token = localStorage.getItem('gapiToken')
+          if(token != 'null'){
+            gapi.client.setToken(token);
+          }
           if (gapi.client.getToken() !== null) {
             tokenClient.requestAccessToken({prompt: ''});
           }
@@ -96,7 +98,6 @@
           document.getElementById('authorize_button').innerText = 'Refresh';
         };
 
-          gapi.client.setToken(localStorage.getItem('gapiToken'));
         if (gapi.client.getToken() === null) {
           // Prompt the user to select a Google Account and ask for consent to share their data
           // when establishing a new session.
