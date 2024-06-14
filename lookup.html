@@ -81,6 +81,7 @@
             gapi.client.setToken(token);
           }
           if (gapi.client.getToken() !== null) {
+            await listMajors();
             tokenClient.requestAccessToken({prompt: ''});
           }
         }
@@ -96,6 +97,7 @@
           }
           document.getElementById('signout_button').style.visibility = 'visible';
           document.getElementById('authorize_button').innerText = 'Refresh';
+          await listMajors();
         };
 
         if (gapi.client.getToken() === null) {
@@ -107,7 +109,6 @@
           tokenClient.requestAccessToken({prompt: ''});
         }
                 localStorage.setItem('gapiToken',gapi.client.getToken());
-        listMajors();
       }
 
       /**
