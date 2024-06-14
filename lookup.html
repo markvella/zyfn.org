@@ -3,10 +3,10 @@
   <head>
     <title>Sheets API Quickstart</title>
     <meta charset="utf-8" />
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
   </head>
-  <body>
-    <p>Sheets API Quickstart</p>
-
+  <body>    
+    <div id="reader" width="600px"></div>
     <!--Add buttons to initiate auth sequence and sign out-->
     <button id="authorize_button" onclick="handleAuthClick()">Authorize</button>
     <button id="signout_button" onclick="handleSignoutClick()">Sign Out</button>
@@ -25,6 +25,11 @@
       /* exported gisLoaded */
       /* exported handleAuthClick */
       /* exported handleSignoutClick */
+      let html5QrcodeScanner = new Html5QrcodeScanner(
+      "reader",
+      { fps: 10, qrbox: {width: 250, height: 250} },
+      /* verbose= */ false);
+    html5QrcodeScanner.render(onScanSuccess, onScanFailure);
       const urlParams = new URLSearchParams(window.location.search);
       let ticketId = urlParams.get('id');
       // TODO(developer): Set to client ID and API key from the Developer Console
