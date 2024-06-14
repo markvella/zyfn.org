@@ -37,6 +37,14 @@
       document.getElementById('authorize_button').style.visibility = 'hidden';
       document.getElementById('signout_button').style.visibility = 'hidden';
 
+      tokenClient.callback = async (resp) => {
+          if (resp.error !== undefined) {
+            throw (resp);
+          }
+          document.getElementById('signout_button').style.visibility = 'visible';
+          document.getElementById('authorize_button').innerText = 'Refresh';
+          await listMajors();
+        };
       /**
        * Callback after api.js is loaded.
        */
@@ -81,7 +89,6 @@
             gapi.client.setToken(token);
           }
           if (gapi.client.getToken() !== null) {
-            await listMajors();
             tokenClient.requestAccessToken({prompt: ''});
           }
         }
@@ -91,14 +98,6 @@
        *  Sign in the user upon button click.
        */
       function handleAuthClick() {
-        tokenClient.callback = async (resp) => {
-          if (resp.error !== undefined) {
-            throw (resp);
-          }
-          document.getElementById('signout_button').style.visibility = 'visible';
-          document.getElementById('authorize_button').innerText = 'Refresh';
-          await listMajors();
-        };
 
         if (gapi.client.getToken() === null) {
           // Prompt the user to select a Google Account and ask for consent to share their data
