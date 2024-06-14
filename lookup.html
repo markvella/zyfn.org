@@ -65,7 +65,7 @@
           scope: SCOPES,
           callback: '', // defined later
         });
-        
+
       tokenClient.callback = async (resp) => {
           if (resp.error !== undefined) {
             throw (resp);
@@ -146,6 +146,16 @@
           document.getElementById('content').innerText = 'No values found.';
           return;
         }
+        let lstTickets = {};
+        console.log(range.values);
+        for(var i=0;i<range.values.length;i++){
+          var currentRow = {};
+          for(var j=0;j<range.values[0].length;j++){
+            currentRow[range.values[0][j]] = range.values[i][j];
+          }
+          lstTickets[range.values[i][0]] = currentRow;
+        }
+        console.log(lstTickets);
         // Flatten to string to display
         const output = range.values.reduce(
             (str, row) => `${str}${row[0]}, ${row[4]}\n`,
