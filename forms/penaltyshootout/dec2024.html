@@ -25,9 +25,20 @@
     <script type="text/javascript">
         const urlParams = new URLSearchParams(window.location.search);
         const id = urlParams.get('id');
+        const functionKey= "uCWKBpMAHSjtRPXPf-mZ1_QP5XpMTKHmppZPAdCV_erGAzFuRIudzw==";
+        var player = {};
         
         if(id) {
-
+            $.ajax( { url: "https://zyfn.azurewebsites.net/api/getPlayer?id="+id,
+                headers: {"x-functions-key":functionKey},
+                async: false,
+                success: function(result){
+                    player = result;
+                },
+                error: function(res, status){
+                    console.error(status);
+                }
+             });
         }
         $('form').jsonForm({
             schema: {
@@ -123,9 +134,7 @@
             onSubmit: function (errors, values) {
                 console.log(values);
             },
-            value: {
-                "name": "Mark"
-            }
+            value: player
         });
     </script>
 </body>
