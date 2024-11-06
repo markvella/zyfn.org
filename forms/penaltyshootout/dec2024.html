@@ -132,7 +132,13 @@
                 }
             ],
             onSubmit: function (errors, values) {
-                console.log(values);
+                $.ajax( { url: "https://zyfn.azurewebsites.net/api/save",
+                headers: {"x-functions-key":functionKey},
+                async: false,
+                success: function(result){
+                    window.location = "https://zyfn.org/forms/penaltyshootout/dec2024.html?id="+result.id;
+                }
+             });
             },
             value: player
         });
