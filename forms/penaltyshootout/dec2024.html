@@ -132,7 +132,9 @@
                 }
             ],
             onSubmit: function (errors, values) {
-                $.ajax( { url: "https://zyfn.azurewebsites.net/api/save",
+                $.ajax( { 
+                    url: "https://zyfn.azurewebsites.net/api/save",
+                method: "POST",
                 headers: {"x-functions-key":functionKey},
                 async: false,
                 success: function(result){
