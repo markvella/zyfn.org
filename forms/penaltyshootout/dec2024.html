@@ -23,6 +23,12 @@
     <script type="text/javascript" src="/deps/opt/jsv.js"></script>
     <script type="text/javascript" src="/lib/jsonform.js"></script>
     <script type="text/javascript">
+        const urlParams = new URLSearchParams(window.location.search);
+        const id = urlParams.get('id');
+        
+        if(id) {
+
+        }
         $('form').jsonForm({
             schema: {
                 email: {
@@ -116,6 +122,9 @@
             ],
             onSubmit: function (errors, values) {
                 console.log(values);
+            },
+            value: {
+                "name": "Mark"
             }
         });
     </script>
