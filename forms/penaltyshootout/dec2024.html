@@ -44,7 +44,7 @@
                     type: 'string',
                     title: 'Age Group',
                     required: true,
-                    enum: ["U7","U8","U9","U10","U11","U13", "P"]
+                    enum: ["U7","U8","U9","U10","U11","U13", "A"]
                 },
                 burger: {
                     type: 'integer',
@@ -93,7 +93,8 @@
                         "U9": "Under 9",
                         "U10": "Under 10",
                         "U11": "Under 11",
-                        "U13": "Under 13"
+                        "U13": "Under 13",
+                        "A": "Adult"
                     }
                 },
                 {
@@ -114,14 +115,7 @@
                 }
             ],
             onSubmit: function (errors, values) {
-                if (errors) {
-                    $('#res').html('<p>I beg your pardon?</p>');
-                }
-                else {
-                    $('#res').html('<p>Hello ' + values.name + '.' +
-                        (values.age ? '<br/>You are ' + values.age + '.' : '') +
-                        '</p>');
-                }
+                console.log(values);
             }
         });
     </script>
