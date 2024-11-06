@@ -1,63 +1,70 @@
 <!DOCTYPE html>
 <html>
-  <head>
+
+<head>
     <meta charset="utf-8" />
     <title>Getting started with JSON Form</title>
     <link rel="stylesheet" type="text/css" href="/deps/opt/bootstrap.css" />
-  </head>
-  <body>
-    <h1>Getting started with JSON Form</h1>
-    <form></form>
+</head>
+
+<body>
+    <div id="container">
+        <div class="center">
+            <h1>Getting started with JSON Form</h1>
+            <form></form>
+        </div>
+    </div>
     <div id="res" class="alert"></div>
     <script type="text/javascript" src="/deps/jquery.min.js"></script>
     <script type="text/javascript" src="/deps/underscore.js"></script>
     <script type="text/javascript" src="/deps/opt/jsv.js"></script>
     <script type="text/javascript" src="/lib/jsonform.js"></script>
     <script type="text/javascript">
-      $('form').jsonForm({
-        schema: {
-          name: {
-            type: 'string',
-            title: 'Name',
-            required: true
-          },
-          age: {
-            type: 'number',
-            title: 'Age'
-          },
-          id: {
-            type: 'string'
-          }
-        },
-        form: [
-            {
-                key: 'id',
-                type: 'hidden'
+        $('form').jsonForm({
+            schema: {
+                name: {
+                    type: 'string',
+                    title: 'Name',
+                    required: true
+                },
+                age: {
+                    type: 'number',
+                    title: 'Age'
+                },
+                id: {
+                    type: 'string'
+                }
             },
-            {
-                key: 'name',
-                type: 'text'
-            },
-            {
-                key: 'age',
-                type: 'number'
-            },            
-            {
-                "type": "submit",
-                "title": "Submit"
+            form: [
+                {
+                    key: 'id',
+                    type: 'hidden'
+                },
+                {
+                    key: 'name',
+                    type: 'text'
+                },
+                {
+                    key: 'age',
+                    type: 'number'
+                },
+                {
+                    "type": "submit",
+                    "title": "Submit"
+                }
+            ],
+            onSubmit: function (errors, values) {
+                if (errors) {
+                    $('#res').html('<p>I beg your pardon?</p>');
+                }
+                else {
+                    $('#res').html('<p>Hello ' + values.name + '.' +
+                        (values.age ? '<br/>You are ' + values.age + '.' : '') +
+                        '</p>');
+                }
             }
-        ],
-        onSubmit: function (errors, values) {
-          if (errors) {
-            $('#res').html('<p>I beg your pardon?</p>');
-          }
-          else {
-            $('#res').html('<p>Hello ' + values.name + '.' +
-              (values.age ? '<br/>You are ' + values.age + '.' : '') +
-              '</p>');
-          }
-        }
-      });
+        });
     </script>
-  </body>
+</body>
+
 </html>
