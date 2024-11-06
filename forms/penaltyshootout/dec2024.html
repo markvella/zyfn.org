@@ -24,8 +24,17 @@
           age: {
             type: 'number',
             title: 'Age'
+          },
+          id: {
+            type: 'string'
           }
         },
+        form: [
+            {
+                key: 'id',
+                type: 'hidden'
+            }
+        ],
         onSubmit: function (errors, values) {
           if (errors) {
             $('#res').html('<p>I beg your pardon?</p>');
