@@ -202,6 +202,10 @@ p{
 
 }
 
+.white-area form label{
+ float:left;
+}
+
 .logo {
     position: absolute;
     top: 0;

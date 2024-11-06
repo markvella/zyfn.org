@@ -12,7 +12,7 @@
     <div id="container">
         <div class="center">
             <div class="white-area">
-                <h1>Getting started with JSON Form</h1>
+                <h1>Penalty Shootout Registration Player Form</h1>
                 <form></form>
             </div>
         </div>
@@ -25,14 +25,41 @@
     <script type="text/javascript">
         $('form').jsonForm({
             schema: {
+                email: {
+                    type: 'string',
+                    title: 'Email',
+                    required: true
+                },
                 name: {
                     type: 'string',
                     title: 'Name',
                     required: true
                 },
-                age: {
-                    type: 'number',
-                    title: 'Age'
+                surname: {
+                    type: 'string',
+                    title: 'Surname',
+                    required: true
+                },
+                agegroup: {
+                    type: 'string',
+                    title: 'Surname',
+                    required: true,
+                    enum: ["U7","U8","U9","U10","U11","U13"]
+                },
+                burger: {
+                    type: 'integer',
+                    required: true,
+                    default: 0                    
+                },
+                nuggets: {
+                    type: 'integer',
+                    required: true,
+                    default: 0                        
+                },
+                hotdog: {
+                    type: 'integer',
+                    required: true,
+                    default: 0                          
                 },
                 id: {
                     type: 'string'
@@ -44,11 +71,38 @@
                     type: 'hidden'
                 },
                 {
+                    key: 'email',
+                    type: 'text'
+                },
+                {
                     key: 'name',
                     type: 'text'
                 },
                 {
-                    key: 'age',
+                    key: 'surname',
+                    type: 'text'
+                },
+                {
+                    key: 'agegroup',
+                    titleMap: {
+                        "U7": "Under 7",
+                        "U8": "Under 8",
+                        "U9": "Under 9",
+                        "U10": "Under 10",
+                        "U11": "Under 11",
+                        "U13": "Under 13"
+                    }
+                },
+                {
+                    key: 'burger',
+                    type: 'number'
+                },
+                {
+                    key: 'nuggets',
+                    type: 'number'
+                },
+                {
+                    key: 'hotdog',
                     type: 'number'
                 },
                 {
