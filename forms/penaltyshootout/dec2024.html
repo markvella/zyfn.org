@@ -202,6 +202,9 @@
             }
             var numberOfOrders = order.burger+order.hotdog+order.nuggets;
             var extra = (numberOfOrders-1)*5;
+            if(extra<0){
+                extra = 0;
+            }
             $("input[name=price]").val(basicPrice+extra);
 
         }
