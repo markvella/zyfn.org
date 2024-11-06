@@ -25,21 +25,38 @@
     <script type="text/javascript">
         const urlParams = new URLSearchParams(window.location.search);
         const id = urlParams.get('id');
-        const functionKey= "uCWKBpMAHSjtRPXPf-mZ1_QP5XpMTKHmppZPAdCV_erGAzFuRIudzw==";
+        const saved = urlParams.get('saved');
+        const functionKey = "uCWKBpMAHSjtRPXPf-mZ1_QP5XpMTKHmppZPAdCV_erGAzFuRIudzw==";
         var player = {};
-        
-        if(id) {
-            $.ajax( { url: "https://zyfn.azurewebsites.net/api/getPlayer?id="+id,
-                headers: {"x-functions-key":functionKey},
+        var order = {
+            burger: 0,
+            hotdog: 0,
+            nuggets: 0
+        };
+
+        if (id) {
+            $.ajax({
+                url: "https://zyfn.azurewebsites.net/api/getPlayer?id=" + id,
+                headers: { "x-functions-key": functionKey },
                 async: false,
-                success: function(result){
+                success: function (result) {
                     player = result;
+                    order.burger = player.burger;
+                    order.hotdog = player.hotdog;
+                    order.nuggets = player.nuggets;
                 },
-                error: function(res, status){
+                error: function (res, status) {
                     console.error(status);
                 }
-             });
+            });
         }
+
+        if (saved) {
+            alert("Your details have been saved. We suggest bookmarking this page to edit your booking in the future.");
+
+        }
+
+
         $('form').jsonForm({
             schema: {
                 email: {
@@ -61,25 +78,29 @@
                     type: 'string',
                     title: 'Age Group',
                     required: true,
-                    enum: ["U7","U8","U9","U10","U11","U13", "A"]
+                    enum: ["U7", "U8", "U9", "U10", "U11", "U13", "A"]
                 },
                 burger: {
                     type: 'integer',
                     required: true,
                     title: 'Burger & Chips',
-                    default: 0                    
+                    default: 0
                 },
                 nuggets: {
                     type: 'integer',
                     required: true,
                     title: 'Nuggets & Chips',
-                    default: 0                        
+                    default: 0
                 },
                 hotdog: {
                     type: 'integer',
                     title: 'Hotdog & Chips',
                     required: true,
-                    default: 0                          
+                    default: 0
+                },
+                price: {
+                    type: 'number',
+                    title: 'Price'
                 },
                 id: {
                     type: 'string'
@@ -112,19 +133,42 @@
                         "U11": "Under 11",
                         "U13": "Under 13",
                         "A": "Adult"
+                    },
+                    "onChange": function (evt) {
+                        calculatePrice();
                     }
                 },
                 {
                     key: 'burger',
-                    type: 'number'
+                    type: 'number',
+                    "onChange": function (evt) {
+                        var value = $(evt.target).val();
+                        order.burger = parseInt(value);
+                        calculatePrice();
+                    }
                 },
                 {
                     key: 'nuggets',
-                    type: 'number'
+                    type: 'number',
+                    "onChange": function (evt) {
+                        var value = $(evt.target).val();
+                        order.nuggets = parseInt(value);
+                        calculatePrice();
+                    }
                 },
                 {
                     key: 'hotdog',
-                    type: 'number'
+                    type: 'number',
+                    "onChange": function (evt) {
+                        var value = $(evt.target).val();
+                        order.hotdog = parseInt(value);
+                        calculatePrice();
+                    }
+                },
+                {
+                    "key": "price",
+                    "title": "Price",
+                    readonly: true
                 },
                 {
                     "type": "submit",
@@ -132,18 +176,35 @@
                 }
             ],
             onSubmit: function (errors, values) {
-                $.ajax( { 
+                console.log(values);
+                $.ajax({
                     url: "https://zyfn.azurewebsites.net/api/save",
-                method: "POST",
-                headers: {"x-functions-key":functionKey},
-                async: false,
-                success: function(result){
-                    window.location = "https://zyfn.org/forms/penaltyshootout/dec2024.html?id="+result.id;
-                }
-             });
+                    method: "POST",
+                    headers: { "x-functions-key": functionKey },
+                    async: false,
+                    data: JSON.stringify(values),
+                    contentType: "application/json; charset=utf-8",
+                    success: function (result) {
+                        window.location = "https://zyfn.org/forms/penaltyshootout/dec2024.html?id=" + result.value.id + "&saved=true";
+                    }
+                });
             },
             value: player
         });
+
+        
+        calculatePrice();
+
+        function calculatePrice(){
+            var basicPrice = 20;
+            if($("select[name=agegroup]").val() == "A"){
+                basicPrice=15;
+            }
+            var numberOfOrders = order.burger+order.hotdog+order.nuggets;
+            var extra = (numberOfOrders-1)*5;
+            $("input[name=price]").val(basicPrice+extra);
+
+        }
     </script>
 </body>
 
