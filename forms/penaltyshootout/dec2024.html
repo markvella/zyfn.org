@@ -42,22 +42,25 @@
                 },
                 agegroup: {
                     type: 'string',
-                    title: 'Surname',
+                    title: 'Age Group',
                     required: true,
-                    enum: ["U7","U8","U9","U10","U11","U13"]
+                    enum: ["U7","U8","U9","U10","U11","U13", "P"]
                 },
                 burger: {
                     type: 'integer',
                     required: true,
+                    title: 'Burger & Chips',
                     default: 0                    
                 },
                 nuggets: {
                     type: 'integer',
                     required: true,
+                    title: 'Nuggets & Chips',
                     default: 0                        
                 },
                 hotdog: {
                     type: 'integer',
+                    title: 'Hotdog & Chips',
                     required: true,
                     default: 0                          
                 },
