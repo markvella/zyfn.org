@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>Penalty Shootout Registration Player Form</title>
+    <title>Christmas Party Application Form</title>
     <link rel="stylesheet" type="text/css" href="/deps/opt/bootstrap.css" />
     <link rel="stylesheet" href="/css/styles.css">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -25,7 +25,7 @@
     <div id="container">
         <div class="center">
             <div class="white-area">
-                <h1>Penalty Shootout Registration Player Form</h1>
+                <h1>Christmas Party Application Form</h1>
                 <form></form>
             </div>
         </div>
@@ -37,36 +37,34 @@
     <script type="text/javascript" src="/lib/jsonform.js"></script>
     <script type="text/javascript">
         const urlParams = new URLSearchParams(window.location.search);
-        const id = urlParams.get('id');
-        const saved = urlParams.get('saved');
+        var id = urlParams.get('id');
+        var saved = urlParams.get('saved');
         const functionKey = "uCWKBpMAHSjtRPXPf-mZ1_QP5XpMTKHmppZPAdCV_erGAzFuRIudzw==";
-        var player = {};
-        var order = {
-            burger: 0,
-            hotdog: 0,
-            nuggets: 0
-        };
 
         if (id) {
             $.ajax({
-                url: "https://zyfn.azurewebsites.net/api/getPlayer?id=" + id,
+                url: "https://zyfn.azurewebsites.net/api/getXmasRegistration?id=" + id,
                 headers: { "x-functions-key": functionKey },
                 async: false,
                 success: function (result) {
                     player = result;
-                    order.burger = player.burger;
-                    order.hotdog = player.hotdog;
-                    order.nuggets = player.nuggets;
                 },
                 error: function (res, status) {
                     console.error(status);
                 }
             });
         }
+        else{            
+            id=crypto.randomUUID();
+        }
+        var player = {price:"20",id: id};
 
         if (saved) {
-            alert("Your details have been saved. We suggest bookmarking this page to edit your booking in the future.");
-
+            alert("Your details have been saved.");
+            saved = true;
+        }
+        else{
+            saved= false;
         }
 
 
@@ -77,44 +75,28 @@
                     title: 'Email',
                     required: true
                 },
+                mobile: {
+                    type: 'string',
+                    title: 'Mobile',
+                    required: true
+                },
                 name: {
                     type: 'string',
-                    title: 'Name',
+                    title: 'Child\'s Name',
                     required: true
                 },
                 surname: {
                     type: 'string',
-                    title: 'Surname',
+                    title: 'Child\'s Surname',
                     required: true
                 },
                 ageGroup: {
                     type: 'string',
                     title: 'Age Group',
                     required: true,
-                    enum: ["U56", "U7", "U8", "U9", "U10", "U11", "U13", "A"]
+                    enum: ["U56", "U7", "U8", "U9", "U10", "U11", "U13"]
                 },
-                burger: {
-                    type: 'integer',
-                    required: true,
-                    title: 'Burger & Chips',
-                    default: 0
-                },
-                nuggets: {
-                    type: 'integer',
-                    required: true,
-                    title: 'Nuggets & Chips',
-                    default: 0
-                },
-                hotdog: {
-                    type: 'integer',
-                    title: 'Hotdog & Chips',
-                    required: true,
-                    default: 0
-                },
-                price: {
-                    type: 'number',
-                    title: 'Price'
-                },
+                price: {type:'string'},
                 id: {
                     type: 'string'
                 }
@@ -126,6 +108,10 @@
                 },
                 {
                     key: 'email',
+                    type: 'text'
+                },
+                {
+                    key: 'mobile',
                     type: 'text'
                 },
                 {
@@ -145,43 +131,13 @@
                         "U9": "Under 9",
                         "U10": "Under 10",
                         "U11": "Under 11",
-                        "U13": "Under 13",
-                        "A": "Adult"
-                    },
-                    "onChange": function (evt) {
-                        calculatePrice();
-                    }
-                },
-                {
-                    key: 'burger',
-                    type: 'number',
-                    "onChange": function (evt) {
-                        var value = $(evt.target).val();
-                        order.burger = parseInt(value);
-                        calculatePrice();
-                    }
-                },
-                {
-                    key: 'nuggets',
-                    type: 'number',
-                    "onChange": function (evt) {
-                        var value = $(evt.target).val();
-                        order.nuggets = parseInt(value);
-                        calculatePrice();
-                    }
-                },
-                {
-                    key: 'hotdog',
-                    type: 'number',
-                    "onChange": function (evt) {
-                        var value = $(evt.target).val();
-                        order.hotdog = parseInt(value);
-                        calculatePrice();
+                        "U13": "Under 13"
                     }
                 },
                 {
                     "key": "price",
                     "title": "Price",
+                    default: "20",
                     readonly: true
                 },
                 {
@@ -192,45 +148,34 @@
                 "type": "button",
                 "title": "New",
                 "onClick": function() {
-                        window.location = "https://zyfn.org/forms/penaltyshootout/dec2024.html";
+                        window.location = "https://zyfn.org/forms/xmas2024/xmas.html";
                     }
                 }
             ],
             onSubmit: function (errors, values) {                
                 $('form input:submit').attr('disabled','disabled');
+                values.isNew = !saved;
+                values.year = "2024";
                 $.ajax({
-                    url: "https://zyfn.azurewebsites.net/api/save",
+                    url: "https://zyfn.azurewebsites.net/api/saveXmasBooking",
                     method: "POST",
                     headers: { "x-functions-key": functionKey },
                     async: false,
                     data: JSON.stringify(values),
                     contentType: "application/json; charset=utf-8",
-                    success: function (result) {                        
-                        window.location = "https://zyfn.org/forms/penaltyshootout/dec2024.html?id=" + result.value.id + "&saved=true";
+                    success: function (result) {  
+                        $('form input:submit').removeAttr('disabled');                      
+                        window.location = "https://zyfn.org/forms/xmas2024/xmas.html?id=" + values.id + "&saved=true";
+                    },
+                    error: function(){
+                        alert("Failed to save booking, please try again. If the problem persists contact Zebbug Rangers Youth Nursery.")
                     }
                 });
-                
-                $('form input:submit').removeAttr('disabled');
             },
             value: player
         });
 
         
-        calculatePrice();
-
-        function calculatePrice(){
-            var basicPrice = 20;
-            if($("select[name=agegroup]").val() == "A"){
-                basicPrice=15;
-            }
-            var numberOfOrders = order.burger+order.hotdog+order.nuggets;
-            var extra = (numberOfOrders-1)*5;
-            if(extra<0){
-                extra = 0;
-            }
-            $("input[name=price]").val(basicPrice+extra);
-
-        }
     </script>
 </body>
 
