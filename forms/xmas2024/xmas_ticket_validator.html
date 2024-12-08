@@ -138,6 +138,8 @@ $("#btnPay").click(function() {
                     data: JSON.stringify(payload),
                     contentType: "application/json; charset=utf-8",
                     success: function (result) {  
+                        $("#btnPay").css("display","none");                        
+                        $("#status").text("Paid");
                         alert("Marked as paid");
                     },
                     error: function(){
