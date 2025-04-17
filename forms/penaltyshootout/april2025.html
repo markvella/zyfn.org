@@ -64,8 +64,8 @@
         <td>{{name}}</td>
         <td>{{surname}}</td>
         <td>{{ageGroup}}</td>
-        <td><a href="#" onclick="editParticipant({{index}})">Edit</a></td>
-        <td><a href="#" onclick="deleteParticipant({{index}})">Delete</a></td>
+        <td><a href="#" onclick="editParticipant({{id}})">Edit</a></td>
+        <td><a href="#" onclick="deleteParticipant({{id}})">Delete</a></td>
         </tr>
         {{/participants}}
             <tbody>
@@ -84,6 +84,7 @@
             pork: 0,
             nuggets: 0
         };
+        var currentId = 0;
 
         if (id) {
             $.ajax({
@@ -239,10 +240,10 @@
                 ],
                 onSubmitValid: function (values) {
                     $('form input:submit').attr('disabled', 'disabled');
-                    values.index = currentIndex;
+                    values.id = currentId;
                     participantList.participants[currentIndex] = values;
                     currentIndex = participantList.participants.length;
-                    console.log(participantList);
+                    currentId++;
                     renderList();
                     calculatePrice();
                     $('form input:submit').removeAttr('disabled');
@@ -255,16 +256,24 @@
 
         calculatePrice();
 
-        function editParticipant(index) {
-            currentIndex = index;
-            bindParticipantForm(participantList.participants[index]);
+        function editParticipant(id) {
+            currentIndex = findEntry(id);
+            bindParticipantForm(participantList.participants[currentIndex]);
         }
-        function deleteParticipant(index) {
-            participantList.participants.splice(index, 1);
+        function deleteParticipant(id) {
+            
+            participantList.participants.splice(findEntry(id), 1);
             currentIndex = participantList.participants.length;
             calculatePrice();
             bindParticipantForm();
             renderList();
+        }
+
+        function findEntry(id){
+            for (var index in participantList.participants) {
+                var participant = participantList.participants[index];
+                if(participant.id == id) return index;
+            }
         }
 
         function countChildren() {
