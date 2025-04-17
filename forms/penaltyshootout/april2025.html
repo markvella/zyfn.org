@@ -311,7 +311,7 @@
 
         function save(){
             var totalItems = order.chicken + order.nuggets + order.pork;
-            if(totalItems > countChildren()){
+            if(totalItems < countChildren()){
                 alert("Amount of food ordered does not match participants");
             }
         }
