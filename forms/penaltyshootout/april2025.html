@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Penalty Shootout Registration Player Form</title>
+    <link rel="stylesheet" type="text/css" href="/deps/opt/bootstrap.css" />
+    <link rel="stylesheet" href="/css/styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+
+    <link rel="apple-touch-icon" sizes="76x76" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="theme-color" content="#ffffff">
+</head>
+
+<body>
+    <div id="container">
+        <div class="center">
+            <div class="white-area">
+                <h1>Penalty Shootout Registration Player Form</h1>
+                <form id="mainForm"></form>
+                <div id="particpantContainer" style="background-color: #eeeeee; padding: 5px;  border-radius: 5px;">
+                    <div id="lstParticpants"></div>
+                    <form id="participantDetails"></form>
+                </div>
+                <div class="form-group jsonform-disabled"><label for="">Price</label>
+                    <div class="controls"><input type="number" class="form-control" name="price" value="0" id="txtPrice"
+                            aria-label="Price" disabled="" step="any"><span class="help-block jsonform-errortext"
+                            style="display:none;"></span></div>
+                </div>
+
+                <input type="button" class="btn btn-primary " value="Save" onclick="save()">
+            </div>
+        </div>
+    </div>
+    <div id="res" class="alert"></div>
+    <script type="text/javascript" src="/deps/jquery.min.js"></script>
+    <script type="text/javascript" src="/deps/underscore.js"></script>
+    <script type="text/javascript" src="/deps/opt/jsv.js"></script>
+    <script type="text/javascript" src="/lib/jsonform.js"></script>
+    <script type="text/javascript" src="/node_modules/mustache/mustache.min.js"></script>
+
+
+    <script id="template" type="x-tmpl-mustache">
+        <table class="table">
+            <thead>
+              <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Surname</th>
+                    <th scope="col">Age Group</th>
+              </tr>
+            </thead>
+            <tbody>
+        {{#participants}}
+        <tr>
+        <td>{{name}}</td>
+        <td>{{surname}}</td>
+        <td>{{ageGroup}}</td>
+        <td><a href="#" onclick="editParticipant({{index}})">Edit</a></td>
+        <td><a href="#" onclick="deleteParticipant({{index}})">Delete</a></td>
+        </tr>
+        {{/participants}}
+            <tbody>
+        </table>
+    </script>
+    <script type="text/javascript">
+        const urlParams = new URLSearchParams(window.location.search);
+        const id = urlParams.get('id');
+        const saved = urlParams.get('saved');
+        const functionKey = "uCWKBpMAHSjtRPXPf-mZ1_QP5XpMTKHmppZPAdCV_erGAzFuRIudzw==";
+        var mainDetails = {};
+        var participantList = { participants: [] };
+        var currentIndex = 0;
+        var order = {
+            chicken: 0,
+            pork: 0,
+            nuggets: 0
+        };
+
+        if (id) {
+            $.ajax({
+                url: "https://zyfn.azurewebsites.net/api/getPlayer?id=" + id,
+                headers: { "x-functions-key": functionKey },
+                async: false,
+                success: function (result) {
+                    player = result;
+                    order.burger = player.burger;
+                    order.hotdog = player.hotdog;
+                    order.nuggets = player.nuggets;
+                },
+                error: function (res, status) {
+                    console.error(status);
+                }
+            });
+        }
+
+        if (saved) {
+            alert("Your details have been saved. We suggest bookmarking this page to edit your booking in the future.");
+
+        }
+        bindMainForm();
+        bindParticipantForm();
+        renderList();
+
+        function bindMainForm() {
+            $('form#mainForm').jsonForm(
+                {
+                    schema: {
+                        email: {
+                            type: "string",
+                            required: true
+                        },
+                        chicken: {
+                            type: "integer",
+                            required: true,
+                            default: 0
+                        },
+                        pork: {
+                            type: "integer",
+                            required: true,
+                            default: 0
+                        },
+                        nuggets: {
+                            type: "integer",
+                            required: true,
+                            default: 0
+                        }
+                    },
+                    form: [
+                        {
+                            key: "email",
+                            title: "Email"
+                        },
+                        {
+                            key: "chicken",
+                            title: "Chicken",
+                            "onChange": function (evt) {
+                                var value = $(evt.target).val();
+                                order.chicken = parseInt(value);
+                                calculatePrice();
+                            }
+                        },
+                        {
+                            key: "nuggets",
+                            title: "Chicken Nuggets",
+                            "onChange": function (evt) {
+                                var value = $(evt.target).val();
+                                order.nuggets = parseInt(value);
+                                calculatePrice();
+                            }
+                        },
+                        {
+                            key: "pork",
+                            title: "Pork",
+                            "onChange": function (evt) {
+                                var value = $(evt.target).val();
+                                order.pork = parseInt(value);
+                                calculatePrice();
+                            }
+                        }
+                    ]
+                }
+            );
+        }
+
+        function bindParticipantForm(details) {
+            $("form#participantDetails").remove();
+            var newForm = $("<form></form>");
+            newForm.attr("id", "participantDetails");
+            $("div#particpantContainer").append(newForm);
+            frm = $('form#participantDetails').jsonForm({
+                schema: {
+                    name: {
+                        type: 'string',
+                        title: 'Name',
+                        required: true
+                    },
+                    surname: {
+                        type: 'string',
+                        title: 'Surname',
+                        required: true
+                    },
+                    ageGroup: {
+                        type: 'string',
+                        title: 'Age Group',
+                        required: true,
+                        enum: ["U56", "U7", "U8", "U9", "U10", "U11", "U13", "A"]
+                    },
+                    index: {
+                        type: 'string'
+                    }
+                },
+                form: [
+                    {
+                        key: 'index',
+                        type: 'hidden'
+                    },
+                    {
+                        key: 'name',
+                        type: 'text'
+                    },
+                    {
+                        key: 'surname',
+                        type: 'text'
+                    },
+                    {
+                        key: 'ageGroup',
+                        titleMap: {
+                            "U56": "Under 5 & 6",
+                            "U7": "Under 7",
+                            "U8": "Under 8",
+                            "U9": "Under 9",
+                            "U10": "Under 10",
+                            "U11": "Under 11",
+                            "U13": "Under 13",
+                            "A": "Adult"
+                        }
+                    },
+                    {
+                        "type": "submit",
+                        "title": "Add"
+                    },
+                    {
+                        "type": "button",
+                        "title": "New",
+                        "onClick": function () {
+                            currentIndex = participantList.participants.length;
+                            bindParticipantForm();
+                        }
+                    }
+                ],
+                onSubmitValid: function (values) {
+                    $('form input:submit').attr('disabled', 'disabled');
+                    values.index = currentIndex;
+                    participantList.participants[currentIndex] = values;
+                    currentIndex = participantList.participants.length;
+                    console.log(participantList);
+                    renderList();
+                    calculatePrice();
+                    $('form input:submit').removeAttr('disabled');
+                    return false;
+                },
+                value: details
+            });
+
+        }
+
+        calculatePrice();
+
+        function editParticipant(index) {
+            currentIndex = index;
+            bindParticipantForm(participantList.participants[index]);
+        }
+        function deleteParticipant(index) {
+            participantList.participants.splice(index, 1);
+            currentIndex = participantList.participants.length;
+            calculatePrice();
+            bindParticipantForm();
+            renderList();
+        }
+
+        function countChildren() {
+            var children = 0;
+            for (var index in participantList.participants) {
+                var participant = participantList.participants[index];
+                console.log(participant.ageGroup);
+                if (participant.ageGroup != "A") {
+                    children++;
+                }
+            }
+            return children;
+        }
+
+        function calculatePrice() {
+            var price = 0;
+            var children = 0;
+            for (var index in participantList.participants) {
+                var participant = participantList.participants[index];
+                console.log(participant.ageGroup);
+                if (participant.ageGroup == "A") {
+                    price += 10;
+                }
+                else {
+                    price += 25;
+                    children++;
+                }
+            }
+            var itemsPreChildren = order.chicken + order.nuggets + order.pork;
+            var totalItems = itemsPreChildren - children;
+            price += totalItems * 30;
+            console.log({items: totalItems, price: price});
+            if(price>0){
+                document.getElementById("txtPrice").value = price;
+            }
+        }
+
+        function renderList() {
+            const template = document.getElementById('template').innerHTML;
+            const rendered = Mustache.render(template, participantList);
+
+            document.getElementById("lstParticpants").innerHTML = rendered;
+        }
+
+        function save(){
+            var itemsPreChildren = order.chicken + order.nuggets + order.pork;
+            var totalItems = itemsPreChildren - countChildren();
+            if(participantList.participants.length> itemsPreChildren){
+                alert("Amount of ");
+            }
+        }
+    </script>
+</body>
+
+</html>
