@@ -310,9 +310,8 @@
         }
 
         function save(){
-            var itemsPreChildren = order.chicken + order.nuggets + order.pork;
-            var totalItems = itemsPreChildren - countChildren();
-            if(totalItems < itemsPreChildren){
+            var totalItems = order.chicken + order.nuggets + order.pork;
+            if(totalItems > countChildren()){
                 alert("Amount of food ordered does not match participants");
             }
         }
