@@ -198,7 +198,7 @@
                         type: 'string',
                         title: 'Age Group',
                         required: true,
-                        enum: ["U56", "U7", "U8", "U9", "U10", "U11", "U13", "A"]
+                        enum: ["-","U56", "U7", "U8", "U9", "U10", "U11", "U13", "A"]
                     },
                     index: {
                         type: 'string'
@@ -246,6 +246,11 @@
                 onSubmitValid: function (values) {
                     $('form input:submit').attr('disabled', 'disabled');
                     values.id = currentId;
+                    if(values.ageGroup == "-") {
+                        alert("Select a valid agegroup");
+                        $('form input:submit').removeAttr('disabled');
+                        return false;
+                    }
                     participantList.participants[currentIndex] = values;
                     currentIndex = participantList.participants.length;
                     currentId++;
