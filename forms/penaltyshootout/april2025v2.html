@@ -26,14 +26,16 @@
             <div class="mb-3">
                 <label for="bookingName" class="form-label">Booking Name</label>
                 <input type="text" class="form-control" id="bookingName" name="bookingName" required>
-              </div>
-              
-              <div class="mb-3">
+            </div>
+
+            <div class="mb-3">
                 <label for="bookingEmail" class="form-label">Booking Email</label>
                 <input type="email" class="form-control" id="bookingEmail" name="bookingEmail" required>
-              </div>
+            </div>
             <div id="participants"></div>
-
+            <small class="text-muted d-block mb-2">
+                Click "Add Participant" to include multiple participants or food-only guests.
+            </small>
             <div class="d-flex justify-content-between mb-3">
                 <button type="button" class="btn btn-outline-primary" onclick="addParticipant()">Add
                     Participant</button>
@@ -93,7 +95,7 @@
                         var div = addParticipant(participantData);
                         toggleFields(div);
                     });
-                    
+
                 } else {
                     alert("Booking not found!");
                 }
@@ -326,7 +328,30 @@
 
 
         function calculateTotalCost() {
-            updateTotalCost();
+            let total = 0;
+
+            document.querySelectorAll('.participant').forEach(participant => {
+                const ageGroup = participant.querySelector(`select[name^="age"]`)?.value || '';
+                const isAdult = ageGroup === 'Adult';
+                const participating = participant.querySelector(`select[name^="participating"]`).value === 'yes';
+                const food = participant.querySelector(`select[name^="food"]`)?.value === 'yes';
+
+                if (!participating && food) {
+                    total += 30; // food-only guest
+                } else if (participating) {
+                    if (!isAdult) {
+                        total += 25; // Kids
+                    } else {
+                        total += 10; // Adults
+                        if (food) total += 30;
+                    }
+                } else {
+                    total += 10; // Non-participating adult
+                    if (isAdult && food) total += 30;
+                }
+            });
+
+            return total;
         }
 
         // Add initial participant
