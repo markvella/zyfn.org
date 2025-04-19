@@ -74,6 +74,8 @@
         }
         // Parse URL query string and load data based on ID
         function loadDataFromQueryString() {
+            const bookNameField = document.querySelector(`input[name^="bookingName"]`);
+            const bookEmailField = document.querySelector(`input[name^="bookingEmail"]`);
             const urlParams = new URLSearchParams(window.location.search);
             const bookingId = urlParams.get('id'); // Get the booking ID from the query string
 
@@ -84,6 +86,8 @@
 
                 if (bookingData) {
                     clearParticipants();
+                    bookNameField.value = bookingData.bookingName;
+                    bookEmailField.value = bookingData.bookingEmail;
                     participantCount = 0;
                     bookingData.participants.forEach(participantData => {
                         addParticipant(participantData);
@@ -107,6 +111,16 @@
                 "124": {
                     participants: [
                         { name: "Mark Johnson", age: "Adult", participating: "no", food: "yes", foodType: "pork" }
+                    ]
+                },
+                "125": {
+                    bookingName: "Cleaven Camilleri",
+                    bookingEmail: "test@test.com",
+                    participants: [
+                        { name: "Cleaven Camilleri", age: "Adult", participating: "yes", food: "yes", foodType: "chicken" },
+                        { name: "", age: "", participating: "no", food: "yes", foodType: "chicken" },
+                        { name: "Zak Camilleri", age: "Under 10", participating: "no", food: "yes", foodType: "chicken nuggets" },
+                        { name: "Etahn Camilleri", age: "", participating: "no", food: "yes", foodType: "chicken nuggets" },
                     ]
                 }
             };
