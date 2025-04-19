@@ -90,8 +90,10 @@
                     bookEmailField.value = bookingData.bookingEmail;
                     participantCount = 0;
                     bookingData.participants.forEach(participantData => {
-                        addParticipant(participantData);
+                        var div = addParticipant(participantData);
+                        toggleFields(div);
                     });
+                    
                 } else {
                     alert("Booking not found!");
                 }
@@ -119,8 +121,8 @@
                     participants: [
                         { name: "Cleaven Camilleri", age: "Adult", participating: "yes", food: "yes", foodType: "chicken" },
                         { name: "", age: "", participating: "no", food: "yes", foodType: "chicken" },
-                        { name: "Zak Camilleri", age: "Under 10", participating: "no", food: "yes", foodType: "chicken nuggets" },
-                        { name: "Etahn Camilleri", age: "", participating: "no", food: "yes", foodType: "chicken nuggets" },
+                        { name: "Zak Camilleri", age: "Under 10", participating: "yes", food: "yes", foodType: "chicken nuggets" },
+                        { name: "Etahn Camilleri", age: "Under 10", participating: "yes", food: "yes", foodType: "chicken nuggets" },
                     ]
                 }
             };
@@ -192,6 +194,7 @@
             }
 
             updateTotalCost();  // Update total cost when a new participant is added
+            return div;
         }
 
         function toggleFields(element) {
