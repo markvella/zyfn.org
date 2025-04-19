@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Penalty Shootout Booking</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .card {
+            margin-bottom: 20px;
+        }
+
+        .total-cost {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body class="bg-light">
+
+    <div class="container my-5">
+        <h1 class="text-center mb-4">Penalty Shootout Booking</h1>
+
+        <form id="bookingForm">
+            <div id="participants"></div>
+
+            <div class="d-flex justify-content-between mb-3">
+                <button type="button" class="btn btn-outline-primary" onclick="addParticipant()">Add
+                    Participant</button>
+                <button type="submit" class="btn btn-success">Submit Booking</button>
+            </div>
+
+            <div class="alert alert-info text-center total-cost" id="totalCost">Total Cost: €0</div>
+        </form>
+
+        <div class="alert alert-secondary mt-4">
+            <h5>Pricing Info</h5>
+            <ul class="mb-0">
+                <li><strong>Kids (Under 17 age groups)</strong> participating: €25 (includes food)</li>
+                <li><strong>Adults</strong> participating: €10 (food optional +€30)</li>
+                <li><strong>Non-participants</strong>: €10 (adults may add food +€30)</li>
+                <li><strong>Food-only guests</strong>: €30 (no name or age required)</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        let participantCount = 0;
+
+        const ageGroups = [
+            "Under 5&6",
+            "Under 7",
+            "Under 8",
+            "Under 9",
+            "Under 10",
+            "Under 11",
+            "Under 13",
+            "Under 15",
+            "Under 17",
+            "Adult"
+        ];
+
+        function addParticipant() {
+            const container = document.getElementById('participants');
+            const div = document.createElement('div');
+            div.className = 'card participant';
+            div.dataset.index = participantCount;
+
+            const ageOptions = ageGroups.map(group => `<option value="${group}">${group}</option>`).join('');
+
+            div.innerHTML = `
+        <div class="card-body">
+          <h5 class="card-title">Participant ${participantCount + 1}</h5>
+
+          <div class="mb-3 nameField">
+            <label class="form-label">Full Name</label>
+            <input type="text" class="form-control" name="name${participantCount}" required>
+          </div>
+
+          <div class="mb-3 ageField">
+            <label class="form-label">Age Group</label>
+            <select class="form-select" name="age${participantCount}" required onchange="toggleFields(this)">
+              <option value="" disabled selected>Select age group</option>
+              ${ageOptions}
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Participating in Penalty Shootout?</label>
+            <select class="form-select" name="participating${participantCount}" onchange="toggleFields(this)">
+              <option value="yes">Yes</option>
+              <option value="no">No</option>
+            </select>
+          </div>
+
+          <div class="mb-3 foodOption" style="display:none;">
+            <label class="form-label">Would you like food?</label>
+            <select class="form-select" name="food${participantCount}" onchange="toggleFields(this)">
+              <option value="no">No</option>
+              <option value="yes">Yes (+€30)</option>
+            </select>
+          </div>
+
+          <div class="mb-3 foodTypeOption" style="display:none;">
+            <label class="form-label">Select Food Type</label>
+            <select class="form-select" name="foodType${participantCount}">
+              <option value="chicken">Chicken</option>
+              <option value="pork">Pork</option>
+              <option value="nuggets">Chicken Nuggets</option>
+            </select>
+          </div>
+
+          <button type="button" class="btn btn-danger mt-3" onclick="removeParticipant(${participantCount})">Remove Participant</button>
+        </div>
+      `;
+
+            container.appendChild(div);
+            participantCount++;
+            updateTotalCost();  // Update total cost when a new participant is added
+        }
+
+        function toggleFields(element) {
+            const div = element.closest('.participant');
+            const ageSelect = div.querySelector(`select[name^="age"]`);
+            const ageGroup = ageSelect?.value || '';
+            const isAdult = ageGroup === 'Adult';
+            const nameFieldTextBox = div.querySelector(`input[name^="name"]`);
+            const ageGroupCombo = div.querySelector(`select[name^="age"]`);
+
+            var participating = div.querySelector(`select[name^="participating"]`).value === 'yes';
+            const foodSelect = div.querySelector(`select[name^="food"]`);
+            var food = foodSelect?.value === 'yes';
+
+            const foodSection = div.querySelector('.foodOption');
+            const foodTypeSection = div.querySelector('.foodTypeOption');
+            const ageField = div.querySelector('.ageField');
+            const nameField = div.querySelector('.nameField');
+
+            // For participants under 17, food is always selected
+            if ((participating && ageGroup !== 'Adult' && !food) || !participating) {
+                food = foodSelect.value = 'yes';
+            }
+
+            // Show/hide food selector and related sections
+            if (participating) {
+                if (isAdult) {
+                    foodSection.style.display = 'block';
+                } else {
+                    foodSection.style.display = 'none';
+                }
+            } else {
+                foodSection.style.display = 'block';
+            }
+
+            // Show/hide food type section when food is selected
+            foodTypeSection.style.display = food ? 'block' : 'none';
+
+            // Show/hide name and age fields for food-only guests
+            if (!participating && food) {
+                nameField.style.display = 'none';
+                ageField.style.display = 'none';
+                nameFieldTextBox.required = false;
+                ageGroupCombo.required = false;
+            } else {
+                nameField.style.display = 'block';
+                ageField.style.display = 'block';
+                nameFieldTextBox.required = true;
+                ageGroupCombo.required = true;
+            }
+
+            updateTotalCost(); // Recalculate the total cost whenever fields are toggled
+        }
+
+        function toggleFoodType(element) {
+            updateTotalCost(); // Recalculate the total cost whenever food type is selected
+        }
+
+        function removeParticipant(index) {
+            const participantDiv = document.querySelector(`.participant[data-index="${index}"]`);
+            if (participantDiv) {
+                participantDiv.remove();
+                updateTotalCost();
+            }
+        }
+
+        function updateTotalCost() {
+            let total = 0;
+
+            document.querySelectorAll('.participant').forEach(participant => {
+                const ageGroup = participant.querySelector(`select[name^="age"]`)?.value || '';
+                const isAdult = ageGroup === 'Adult';
+                const participating = participant.querySelector(`select[name^="participating"]`).value === 'yes';
+                const food = participant.querySelector(`select[name^="food"]`)?.value === 'yes';
+
+                if (!participating && food) {
+                    total += 30; // food-only guest
+                } else if (participating) {
+                    if (!isAdult) {
+                        total += 25; // Kids participating in penalty shootout
+                    } else {
+                        total += 10; // Adults participating in penalty shootout
+                        if (food) total += 30; // Food for adults
+                    }
+                } else {
+                    total += 10; // Non-participating adults
+                    if (isAdult && food) total += 30; // Food for non-participating adults
+                }
+            });
+
+            document.getElementById('totalCost').textContent = `Total Cost: €${total}`;
+        }
+
+        document.getElementById('bookingForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            // Generate JSON object on form submit
+            const bookingData = generateBookingJSON();
+
+            // Log JSON object to console (you can send this to a server or process further)
+            console.log(JSON.stringify(bookingData, null, 2));
+        });
+        function calculateTotalCost() {
+            updateTotalCost();
+        }
+        function generateBookingJSON() {
+            const participants = [];
+
+            document.querySelectorAll('.participant').forEach(participant => {
+                const name = participant.querySelector(`input[name^="name"]`)?.value || '';
+                const ageGroup = participant.querySelector(`select[name^="age"]`)?.value || '';
+                const participating = participant.querySelector(`select[name^="participating"]`).value === 'yes';
+                const food = participant.querySelector(`select[name^="food"]`)?.value === 'yes';
+                const foodType = participant.querySelector(`select[name^="foodType"]`)?.value || '';
+
+                participants.push({
+                    name,
+                    ageGroup,
+                    participating,
+                    food,
+                    foodType
+                });
+            });
+
+            return {
+                totalCost: calculateTotalCost(),
+                participants
+            };
+        }
+
+        // Add initial participant
+        addParticipant();
+    </script>
+
+</body>
+
+</html>
