@@ -57,8 +57,14 @@
     </div>
 
     <script>
+        const functionKey = "uCWKBpMAHSjtRPXPf-mZ1_QP5XpMTKHmppZPAdCV_erGAzFuRIudzw==";
         let participantCount = 0;
-
+        let globalBookingId = null;
+        var defaultHeaders = {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+            "x-functions-key": functionKey
+        };
         const ageGroups = [
             "Under 5&6",
             "Under 7",
@@ -75,7 +81,7 @@
             document.querySelector(`.participant`).remove();
         }
         // Parse URL query string and load data based on ID
-        function loadDataFromQueryString() {
+        async function loadDataFromQueryString() {
             const bookNameField = document.querySelector(`input[name^="bookingName"]`);
             const bookEmailField = document.querySelector(`input[name^="bookingEmail"]`);
             const urlParams = new URLSearchParams(window.location.search);
@@ -84,9 +90,10 @@
             if (bookingId) {
                 // For the purpose of this example, I will simulate fetching data from local storage
                 // In a real application, you might fetch this data from a server using the ID
-                const bookingData = getBookingDataById(bookingId);
+                const bookingData = await getBookingDataById(bookingId);
 
                 if (bookingData) {
+                    globalBookingId = bookingData.bookingId;
                     clearParticipants();
                     bookNameField.value = bookingData.bookingName;
                     bookEmailField.value = bookingData.bookingEmail;
@@ -97,39 +104,38 @@
                     });
 
                 } else {
+                    globalBookingId = null;
                     alert("Booking not found!");
                 }
             }
         }
 
         // Simulate fetching booking data from local storage or a server
-        function getBookingDataById(id) {
-            // This is just a mock; in real applications, you'd fetch data from a database
-            const mockData = {
-                "123": {
-                    participants: [
-                        { name: "John Doe", age: "Adult", participating: "yes", food: "yes", foodType: "chicken" },
-                        { name: "Jane Smith", age: "Under 17", participating: "yes", food: "no" }
-                    ]
-                },
-                "124": {
-                    participants: [
-                        { name: "Mark Johnson", age: "Adult", participating: "no", food: "yes", foodType: "pork" }
-                    ]
-                },
-                "125": {
-                    bookingName: "Cleaven Camilleri",
-                    bookingEmail: "test@test.com",
-                    participants: [
-                        { name: "Cleaven Camilleri", age: "Adult", participating: "yes", food: "yes", foodType: "chicken" },
-                        { name: "", age: "", participating: "no", food: "yes", foodType: "chicken" },
-                        { name: "Zak Camilleri", age: "Under 10", participating: "yes", food: "yes", foodType: "chicken nuggets" },
-                        { name: "Etahn Camilleri", age: "Under 10", participating: "yes", food: "yes", foodType: "chicken nuggets" },
-                    ]
-                }
-            };
-
-            return mockData[id] || null;
+        async function getBookingDataById(id) {
+            var response = await fetch("https://zyfn.azurewebsites.net/api/getPSOApril2025Booking?id=" + id, {
+                method: 'GET',
+                headers: defaultHeaders
+            })
+            if (response.ok) {
+                return await response.json();
+            }
+            else {
+                return null;
+            }
+        }
+        async function saveBooking(bookingObj){
+            var response = await fetch("https://zyfn.azurewebsites.net/api/savePSOApril2025Booking?", {
+                method: 'POST',
+                headers: defaultHeaders,
+                body: JSON.stringify(bookingObj)
+            })
+            if (response.ok) {
+                alert("Booking as been registered, you should be receiving an email shortly.");
+                window.location.href = "april2025v2.html";
+            }
+            else{
+                alert("Unable to register booking. Please contact committee member.");                
+            }
         }
 
         function addParticipant(participantData = {}) {
@@ -160,16 +166,16 @@
           <div class="mb-3">
             <label class="form-label">Participating in Penalty Shootout?</label>
             <select class="form-select" name="participating${participantCount}" onchange="toggleFields(this)">
-              <option value="yes" ${participantData.participating === 'yes' ? 'selected' : ''}>Yes</option>
-              <option value="no" ${participantData.participating === 'no' ? 'selected' : ''}>No</option>
+              <option value="yes" ${participantData.participating === 'yes' || participantData.participating == true ? 'selected' : ''}>Yes</option>
+              <option value="no" ${participantData.participating === 'no' || participantData.participating == false ? 'selected' : ''}>No</option>
             </select>
           </div>
 
           <div class="mb-3 foodOption" style="${participantData.food ? 'display:block;' : 'display:none;'}">
             <label class="form-label">Would you like food?</label>
             <select class="form-select" name="food${participantCount}" onchange="toggleFields(this)">
-              <option value="no" ${participantData.food === 'no' ? 'selected' : ''}>No</option>
-              <option value="yes" ${participantData.food === 'yes' ? 'selected' : ''}>Yes (+€30)</option>
+              <option value="no" ${participantData.food === 'no'  || participantData.food == false ? 'selected' : ''}>No</option>
+              <option value="yes" ${participantData.food === 'yes' || participantData.food == true ? 'selected' : ''}>Yes (+€30)</option>
             </select>
           </div>
 
@@ -288,12 +294,15 @@
 
         document.getElementById('bookingForm').addEventListener('submit', function (event) {
             event.preventDefault();
-
+            var submitButton = document.querySelector('button[type="submit"]');
+            submitButton.disabled = true;
             // Generate JSON object on form submit
             const bookingData = generateBookingJSON();
 
             // Log JSON object to console (you can send this to a server or process further)
             console.log(JSON.stringify(bookingData, null, 2));
+            saveBooking(bookingData);
+            submitButton.disabled = false;
         });
 
         function generateBookingJSON() {
@@ -311,7 +320,7 @@
 
                 participants.push({
                     name,
-                    ageGroup,
+                    age: ageGroup,
                     participating,
                     food,
                     foodType
@@ -319,6 +328,7 @@
             });
 
             return {
+                bookingId: globalBookingId,
                 bookingName,
                 bookingEmail,
                 totalCost: calculateTotalCost(),
