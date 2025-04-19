@@ -23,10 +23,20 @@
         <h1 class="text-center mb-4">Penalty Shootout Booking</h1>
 
         <form id="bookingForm">
+            <div class="mb-3">
+                <label for="bookingName" class="form-label">Booking Name</label>
+                <input type="text" class="form-control" id="bookingName" name="bookingName" required>
+              </div>
+              
+              <div class="mb-3">
+                <label for="bookingEmail" class="form-label">Booking Email</label>
+                <input type="email" class="form-control" id="bookingEmail" name="bookingEmail" required>
+              </div>
             <div id="participants"></div>
 
             <div class="d-flex justify-content-between mb-3">
-                <button type="button" class="btn btn-outline-primary" onclick="addParticipant()">Add Participant</button>
+                <button type="button" class="btn btn-outline-primary" onclick="addParticipant()">Add
+                    Participant</button>
                 <button type="submit" class="btn btn-success">Submit Booking</button>
             </div>
 
@@ -59,7 +69,7 @@
             "Under 17",
             "Adult"
         ];
-        function clearParticipants(){
+        function clearParticipants() {
             document.querySelector(`.participant`).remove();
         }
         // Parse URL query string and load data based on ID
@@ -74,7 +84,7 @@
 
                 if (bookingData) {
                     clearParticipants();
-                    participantCount=0;
+                    participantCount = 0;
                     bookingData.participants.forEach(participantData => {
                         addParticipant(participantData);
                     });
@@ -268,6 +278,9 @@
         });
 
         function generateBookingJSON() {
+            const bookingName = document.getElementById('bookingName').value;
+            const bookingEmail = document.getElementById('bookingEmail').value;
+
             const participants = [];
 
             document.querySelectorAll('.participant').forEach(participant => {
@@ -287,10 +300,13 @@
             });
 
             return {
+                bookingName,
+                bookingEmail,
                 totalCost: calculateTotalCost(),
                 participants
             };
         }
+
 
         function calculateTotalCost() {
             updateTotalCost();
