@@ -26,8 +26,7 @@
             <div id="participants"></div>
 
             <div class="d-flex justify-content-between mb-3">
-                <button type="button" class="btn btn-outline-primary" onclick="addParticipant()">Add
-                    Participant</button>
+                <button type="button" class="btn btn-outline-primary" onclick="addParticipant()">Add Participant</button>
                 <button type="submit" class="btn btn-success">Submit Booking</button>
             </div>
 
@@ -60,8 +59,52 @@
             "Under 17",
             "Adult"
         ];
+        function clearParticipants(){
+            document.querySelector(`.participant`).remove();
+        }
+        // Parse URL query string and load data based on ID
+        function loadDataFromQueryString() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const bookingId = urlParams.get('id'); // Get the booking ID from the query string
 
-        function addParticipant() {
+            if (bookingId) {
+                // For the purpose of this example, I will simulate fetching data from local storage
+                // In a real application, you might fetch this data from a server using the ID
+                const bookingData = getBookingDataById(bookingId);
+
+                if (bookingData) {
+                    clearParticipants();
+                    participantCount=0;
+                    bookingData.participants.forEach(participantData => {
+                        addParticipant(participantData);
+                    });
+                } else {
+                    alert("Booking not found!");
+                }
+            }
+        }
+
+        // Simulate fetching booking data from local storage or a server
+        function getBookingDataById(id) {
+            // This is just a mock; in real applications, you'd fetch data from a database
+            const mockData = {
+                "123": {
+                    participants: [
+                        { name: "John Doe", age: "Adult", participating: "yes", food: "yes", foodType: "chicken" },
+                        { name: "Jane Smith", age: "Under 17", participating: "yes", food: "no" }
+                    ]
+                },
+                "124": {
+                    participants: [
+                        { name: "Mark Johnson", age: "Adult", participating: "no", food: "yes", foodType: "pork" }
+                    ]
+                }
+            };
+
+            return mockData[id] || null;
+        }
+
+        function addParticipant(participantData = {}) {
             const container = document.getElementById('participants');
             const div = document.createElement('div');
             div.className = 'card participant';
@@ -75,7 +118,7 @@
 
           <div class="mb-3 nameField">
             <label class="form-label">Full Name</label>
-            <input type="text" class="form-control" name="name${participantCount}" required>
+            <input type="text" class="form-control" name="name${participantCount}" required value="${participantData.name || ''}">
           </div>
 
           <div class="mb-3 ageField">
@@ -89,25 +132,25 @@
           <div class="mb-3">
             <label class="form-label">Participating in Penalty Shootout?</label>
             <select class="form-select" name="participating${participantCount}" onchange="toggleFields(this)">
-              <option value="yes">Yes</option>
-              <option value="no">No</option>
+              <option value="yes" ${participantData.participating === 'yes' ? 'selected' : ''}>Yes</option>
+              <option value="no" ${participantData.participating === 'no' ? 'selected' : ''}>No</option>
             </select>
           </div>
 
-          <div class="mb-3 foodOption" style="display:none;">
+          <div class="mb-3 foodOption" style="${participantData.food ? 'display:block;' : 'display:none;'}">
             <label class="form-label">Would you like food?</label>
             <select class="form-select" name="food${participantCount}" onchange="toggleFields(this)">
-              <option value="no">No</option>
-              <option value="yes">Yes (+€30)</option>
+              <option value="no" ${participantData.food === 'no' ? 'selected' : ''}>No</option>
+              <option value="yes" ${participantData.food === 'yes' ? 'selected' : ''}>Yes (+€30)</option>
             </select>
           </div>
 
-          <div class="mb-3 foodTypeOption" style="display:none;">
+          <div class="mb-3 foodTypeOption" style="${participantData.foodType ? 'display:block;' : 'display:none;'}">
             <label class="form-label">Select Food Type</label>
             <select class="form-select" name="foodType${participantCount}">
-              <option value="chicken">Chicken</option>
-              <option value="pork">Pork</option>
-              <option value="nuggets">Chicken Nuggets</option>
+              <option value="chicken" ${participantData.foodType === 'chicken' ? 'selected' : ''}>Chicken</option>
+              <option value="pork" ${participantData.foodType === 'pork' ? 'selected' : ''}>Pork</option>
+              <option value="nuggets" ${participantData.foodType === 'nuggets' ? 'selected' : ''}>Chicken Nuggets</option>
             </select>
           </div>
 
@@ -117,6 +160,13 @@
 
             container.appendChild(div);
             participantCount++;
+
+            // Set the pre-filled values for age, food, etc.
+            const ageSelect = div.querySelector(`select[name="age${participantCount - 1}"]`);
+            if (participantData.age) {
+                ageSelect.value = participantData.age;
+            }
+
             updateTotalCost();  // Update total cost when a new participant is added
         }
 
@@ -172,10 +222,6 @@
             updateTotalCost(); // Recalculate the total cost whenever fields are toggled
         }
 
-        function toggleFoodType(element) {
-            updateTotalCost(); // Recalculate the total cost whenever food type is selected
-        }
-
         function removeParticipant(index) {
             const participantDiv = document.querySelector(`.participant[data-index="${index}"]`);
             if (participantDiv) {
@@ -220,9 +266,7 @@
             // Log JSON object to console (you can send this to a server or process further)
             console.log(JSON.stringify(bookingData, null, 2));
         });
-        function calculateTotalCost() {
-            updateTotalCost();
-        }
+
         function generateBookingJSON() {
             const participants = [];
 
@@ -248,8 +292,16 @@
             };
         }
 
+        function calculateTotalCost() {
+            updateTotalCost();
+        }
+
         // Add initial participant
         addParticipant();
+
+        // Load data from query string when page loads
+        window.onload = loadDataFromQueryString;
+
     </script>
 
 </body>
