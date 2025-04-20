@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Christmas Party Application Form</title>
+    <link rel="stylesheet" type="text/css" href="/deps/opt/bootstrap.css" />
+    <link rel="stylesheet" href="/css/styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+
+    <link rel="apple-touch-icon" sizes="76x76" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="theme-color" content="#ffffff">
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+</head>
+
+<body>
+    <div id="container">
+        <div class="center">
+            <div class="white-area">
+                <h1>April 2025 PSO</h1>                
+                <div id="loggedOnAs" style="display: none;">Logged on as <span id="loggedOnAccount"></span></div>
+                <div id="reader"  style="display: none; width: 100%;" width="600px"></div>
+                <form style="display:none;"></form>
+                <div id="ticketDetails" style="display: none">
+                    <div>Name: <span id="name"></span></div>
+                    <div>Price: <span id="price"></span></div>
+                    <div>Status: <span id="status"></span></div>
+                    <input type="button" class="btn btn-primary " id="btnPay" value="Mark as Paid">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="res" class="alert"></div>
+    <script type="text/javascript" src="/deps/jquery.min.js"></script>
+    <script type="text/javascript" src="/deps/underscore.js"></script>
+    <script type="text/javascript" src="/deps/opt/jsv.js"></script>
+    <script type="text/javascript" src="/lib/jsonform.js"></script>
+    <script type="text/javascript">
+        const functionKey = "uCWKBpMAHSjtRPXPf-mZ1_QP5XpMTKHmppZPAdCV_erGAzFuRIudzw==";
+var userEmail = "";
+        const html5QrCode = new Html5Qrcode("reader", /* verbose= */ true);
+
+        $('form').jsonForm({
+            schema: {
+                id: {
+                    type: 'string',
+                    title: 'ID'
+                }
+            },
+            form: [
+                {
+                    key: 'id',
+                    type: 'text'
+                },
+                {
+                "type": "submit",
+                "title": "Search"
+                },
+                {
+                "type": "button",
+                "title": "Scan",
+                "onClick": function() {
+                        $("#reader").css("display","block");
+                        
+                        html5QrCode.start({ facingMode: "environment" }, config, qrCodeSuccessCallback);
+                    }
+                }
+            ],
+            onSubmit: function (errors, values) {                
+                $.ajax({
+                    url: "https://zyfn.azurewebsites.net/api/getPSOApril2025Booking?id="+values.id,
+                    method: "GET",
+                    headers: { "x-functions-key": functionKey },
+                    async: false,
+                    data: JSON.stringify(values),
+                    contentType: "application/json; charset=utf-8",
+                    success: function (result) {  
+                        $("#ticketDetails").css("display","block");
+                        $("#name").text(result.name);
+                        $("#price").text(result.price);
+                        $("#status").text(result.isPaid ? "Paid" : "Not Paid");
+                        if(!result.isPaid){
+                            $("#btnPay").css("display","block");
+                        }
+                        else{
+                            $("#btnPay").css("display","none");
+                        }
+                    },
+                    error: function(){
+                        alert("Failed to save booking, please try again. If the problem persists contact Zebbug Rangers Youth Nursery.")
+                    }
+                });
+            }
+        });
+
+        function onSignIn(googleUser) {
+        var profile = parseJwt(googleUser.credential);
+        $("#loggedOnAccount").text(profile.email);
+        $("#loggedOnAs").css("display","block");
+        $("form").css("display","block");
+        }
+
+        function parseJwt (token) {
+        var base64Url = token.split('.')[1];
+        var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+
+    return JSON.parse(jsonPayload);
+}
+
+const qrCodeSuccessCallback = (decodedText, decodedResult) => {
+    html5QrCode.stop();
+    $("form input[name='id']").val(decodedText);
+    /* handle success */
+};
+const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+$("#btnPay").click(function() {
+    var payload = {
+        "id": $("form input[name='id']").val(),
+        "username":$("#loggedOnAccount").text()
+    };
+    $.ajax({
+                    url: "https://zyfn.azurewebsites.net/api/markXmasBookingAsPaid",
+                    method: "POST",
+                    headers: { "x-functions-key": functionKey },
+                    async: false,
+                    data: JSON.stringify(payload),
+                    contentType: "application/json; charset=utf-8",
+                    success: function (result) {  
+                        $("#btnPay").css("display","none");                        
+                        $("#status").text("Paid");
+                        alert("Marked as paid");
+                    },
+                    error: function(){
+                        alert("Failed to save booking, please try again. If the problem persists contact Zebbug Rangers Youth Nursery.")
+                    }
+                });    
+});
+
+    </script>
+    
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <div id="g_id_onload"
+         data-client_id="1074641206680-2gct9jg45tdr1mkjv55vgaeopq5c7c3p.apps.googleusercontent.com"
+         data-callback="onSignIn"         
+        data-login_uri="http://localhost:8081">
+         <div class="g_id_signin" data-type="standard"></div>
+    </div>
+</body>
+
+</html>
