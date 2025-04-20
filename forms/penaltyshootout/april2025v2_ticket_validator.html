@@ -32,6 +32,9 @@
                 <form style="display:none;"></form>
                 <div id="ticketDetails" style="display: none">
                     <div>Name: <span id="name"></span></div>
+                    <div>Child Participants: <span id="kidPart"></span></div>
+                    <div>Adult Participants: <span id="adultPart"></span></div>
+                    <div>Food Only: <span id="foodOnly"></span></div>
                     <div>Price: <span id="price"></span></div>
                     <div>Status: <span id="status"></span></div>
                     <input type="button" class="btn btn-primary " id="btnPay" value="Mark as Paid">
@@ -85,8 +88,14 @@ var userEmail = "";
                     contentType: "application/json; charset=utf-8",
                     success: function (result) {  
                         $("#ticketDetails").css("display","block");
-                        $("#name").text(result.name);
-                        $("#price").text(result.price);
+                        $("#name").text(result.bookingName);
+                        $("#price").text(result.totalCost);
+                        var kids = result.participants.filter(x=>x.age!= "Adult");
+                        $("#kidPart").text(kids.length);
+                        var adults = result.participants.filter(x=>x.age == "Adult");
+                        $("#adultPart").text(adults.length);
+                        var foodOnly = result.participants.filter(x=>x.age == "" && x.food);
+                        $("#foodOnly").text(foodOnly.length);
                         $("#status").text(result.isPaid ? "Paid" : "Not Paid");
                         if(!result.isPaid){
                             $("#btnPay").css("display","block");
