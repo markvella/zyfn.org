@@ -90,7 +90,7 @@ var userEmail = "";
                         $("#ticketDetails").css("display","block");
                         $("#name").text(result.bookingName);
                         $("#price").text(result.totalCost);
-                        var kids = result.participants.filter(x=>x.age!= "Adult");
+                        var kids = result.participants.filter(x=>x.age!= "Adult" && x.age != "");
                         $("#kidPart").text(kids.length);
                         var adults = result.participants.filter(x=>x.age == "Adult");
                         $("#adultPart").text(adults.length);
